@@ -443,6 +443,352 @@ function trackEvent(name, params={}) { window.dataLayer.push({event:name, ...par
     init();
   }
 })();
+<script>
+(function () {
+  "use strict";
+
+  /* =========================================================
+     DR UDAY RAVI - COMMON SOCIAL + FAQ FIX
+     Works on:
+     1. Proctology landing page
+     2. Lean Life landing page
+     ========================================================= */
+
+  var SOCIALS = [
+    {
+      name: "Instagram",
+      url: "https://www.instagram.com/drudayravi/"
+    },
+    {
+      name: "Facebook",
+      url: "https://www.facebook.com/profile.php?id=61580869910147"
+    },
+    {
+      name: "YouTube",
+      url: "https://www.youtube.com/@DrUdayRavi"
+    }
+  ];
+
+  /* =========================================================
+     SOCIAL MEDIA
+     ========================================================= */
+  function addSocialLinks() {
+
+    /* Prevent duplicate insertion */
+    if (document.getElementById("dr-uday-social-links")) {
+      return;
+    }
+
+    /* Find footer */
+    var footer =
+      document.querySelector("footer") ||
+      document.querySelector(".footer");
+
+    if (!footer) {
+      return;
+    }
+
+    /* Find footer grid if available */
+    var footerGrid =
+      footer.querySelector(".footer-grid") ||
+      footer;
+
+    /* Create social section */
+    var box = document.createElement("div");
+    box.id = "dr-uday-social-links";
+
+    /* Inline styling so existing CSS cannot hide it */
+    box.style.cssText = [
+      "display:block",
+      "visibility:visible",
+      "opacity:1",
+      "position:relative",
+      "z-index:10",
+      "margin-top:20px",
+      "padding:10px 0",
+      "width:100%"
+    ].join(";");
+
+    var title = document.createElement("h4");
+    title.textContent = "Follow Us";
+    title.style.cssText = [
+      "display:block",
+      "margin:0 0 12px 0",
+      "padding:0",
+      "color:#ffffff",
+      "font-size:12px",
+      "font-weight:800",
+      "line-height:1.4"
+    ].join(";");
+
+    box.appendChild(title);
+
+    var linksWrap = document.createElement("div");
+
+    linksWrap.style.cssText = [
+      "display:flex",
+      "align-items:center",
+      "flex-wrap:wrap",
+      "gap:10px",
+      "width:100%"
+    ].join(";");
+
+    SOCIALS.forEach(function (social) {
+
+      var link = document.createElement("a");
+
+      link.href = social.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = social.name;
+
+      link.style.cssText = [
+        "display:inline-flex",
+        "align-items:center",
+        "justify-content:center",
+        "visibility:visible",
+        "opacity:1",
+        "color:#ffffff",
+        "background:rgba(255,255,255,0.10)",
+        "border:1px solid rgba(255,255,255,0.30)",
+        "border-radius:8px",
+        "padding:8px 12px",
+        "font-size:11px",
+        "font-weight:800",
+        "line-height:1",
+        "text-decoration:none",
+        "cursor:pointer",
+        "transition:all .2s ease"
+      ].join(";");
+
+      link.addEventListener("mouseenter", function () {
+        link.style.background = "#ffffff";
+        link.style.color = "#087d61";
+        link.style.transform = "translateY(-2px)";
+      });
+
+      link.addEventListener("mouseleave", function () {
+        link.style.background = "rgba(255,255,255,0.10)";
+        link.style.color = "#ffffff";
+        link.style.transform = "translateY(0)";
+      });
+
+      linksWrap.appendChild(link);
+    });
+
+    box.appendChild(linksWrap);
+
+    /*
+      Put social section inside footer grid.
+      This avoids the broken structure currently present
+      on the Proctology page.
+    */
+    footerGrid.appendChild(box);
+  }
+
+
+  /* =========================================================
+     FIX EXISTING SOCIAL LINKS IF PRESENT
+     ========================================================= */
+  function repairExistingSocialLinks() {
+
+    var existingLinks = document.querySelectorAll(
+      'a[href*="instagram.com"],' +
+      'a[href*="facebook.com"],' +
+      'a[href*="youtube.com"]'
+    );
+
+    existingLinks.forEach(function (link) {
+
+      var href = link.getAttribute("href") || "";
+      var label = "";
+
+      if (href.indexOf("instagram.com") !== -1) {
+        label = "Instagram";
+      } else if (href.indexOf("facebook.com") !== -1) {
+        label = "Facebook";
+      } else if (href.indexOf("youtube.com") !== -1) {
+        label = "YouTube";
+      }
+
+      if (!label) {
+        return;
+      }
+
+      /*
+        Fix empty <a></a> tags from previous versions.
+      */
+      if (!link.textContent.trim()) {
+        link.textContent = label;
+      }
+
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+
+      link.style.visibility = "visible";
+      link.style.opacity = "1";
+      link.style.display = "inline-flex";
+      link.style.cursor = "pointer";
+    });
+  }
+
+
+  /* =========================================================
+     LEAN LIFE FAQ FIX
+     ========================================================= */
+  function fixFAQs() {
+
+    var questions = document.querySelectorAll(".faq-q");
+
+    if (!questions.length) {
+      return;
+    }
+
+    questions.forEach(function (oldQuestion) {
+
+      /*
+        Clone the question.
+
+        This removes any broken/duplicate event listeners
+        already attached by the existing Lean Life script.
+      */
+      var question = oldQuestion.cloneNode(true);
+
+      oldQuestion.parentNode.replaceChild(question, oldQuestion);
+
+      var item = question.closest(".faq-item");
+
+      if (!item) {
+        item = question.parentElement;
+      }
+
+      if (!item) {
+        return;
+      }
+
+      var answer =
+        item.querySelector(".faq-a") ||
+        question.nextElementSibling;
+
+      var sign = question.querySelector("span");
+
+      /* Accessibility */
+      question.setAttribute("type", "button");
+      question.setAttribute("aria-expanded", "false");
+
+      /* Initial state */
+      if (answer) {
+        answer.style.display = "none";
+        answer.style.maxHeight = "0";
+        answer.style.overflow = "hidden";
+        answer.style.paddingBottom = "0";
+        answer.style.transition =
+          "max-height .25s ease, padding .25s ease";
+      }
+
+      /* Click */
+      question.addEventListener("click", function (event) {
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        var isOpen = item.classList.contains("open");
+
+        /* Close current */
+        if (isOpen) {
+
+          item.classList.remove("open");
+          question.setAttribute("aria-expanded", "false");
+
+          if (answer) {
+            answer.style.display = "none";
+            answer.style.maxHeight = "0";
+            answer.style.paddingBottom = "0";
+          }
+
+          if (sign) {
+            sign.textContent = "+";
+          }
+
+          return;
+        }
+
+        /* Open */
+        item.classList.add("open");
+        question.setAttribute("aria-expanded", "true");
+
+        if (answer) {
+
+          answer.style.display = "block";
+          answer.style.overflow = "hidden";
+          answer.style.maxHeight = "1000px";
+          answer.style.paddingBottom = "22px";
+        }
+
+        if (sign) {
+          sign.textContent = "−";
+        }
+
+      });
+
+      /* Keyboard accessibility */
+      question.addEventListener("keydown", function (event) {
+
+        if (event.key === "Enter" || event.key === " ") {
+
+          event.preventDefault();
+          question.click();
+
+        }
+
+      });
+
+    });
+  }
+
+
+  /* =========================================================
+     INITIALISE
+     ========================================================= */
+  function initDrUdayFix() {
+
+    /*
+      Repair any existing social anchors first.
+    */
+    repairExistingSocialLinks();
+
+    /*
+      Add a guaranteed visible social section.
+    */
+    addSocialLinks();
+
+    /*
+      Repair FAQ on Lean Life.
+      Has no effect on the Proctology page because
+      there are no .faq-q elements there unless present.
+    */
+    fixFAQs();
+  }
+
+
+  /* =========================================================
+     RUN SAFELY
+     ========================================================= */
+  if (document.readyState === "loading") {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      initDrUdayFix
+    );
+
+  } else {
+
+    initDrUdayFix();
+
+  }
+
+})();
+</script>
 </script>
 <a class="floating-wa" href="https://wa.me/919187238870?text=Hello%20Lean%20Life%2C%20I%20would%20like%20to%20know%20more%20about%20medical%20weight%20management." target="_blank" rel="noopener" aria-label="Chat with Lean Life on WhatsApp">
 <svg viewBox="0 0 24 24"><path d="M20 11.5a8.3 8.3 0 0 1-12.7 7.1L4 20l1.4-3.1A8.3 8.3 0 1 1 20 11.5Z"/><path d="M8.6 8.2c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.7 1.7c.1.3.1.5-.1.7l-.5.6c.5 1 1.3 1.8 2.4 2.3l.7-.5c.2-.2.4-.2.7-.1l1.7.8c.3.1.4.3.3.6-.2.8-.8 1.4-1.6 1.5-1.3.2-3.1-.7-4.6-2.1-1.4-1.4-2.4-3.2-2.2-4.6.1-.3.3-.6.8-.9Z"/></svg>
